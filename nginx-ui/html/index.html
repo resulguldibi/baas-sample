@@ -1,0 +1,350 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+
+
+
+    <style type="text/css">
+
+        body {
+            font-weight: 300;
+            font-family: 'Quicksand',sans-serif;
+        }
+
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 200px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+        }
+
+            .styled-table th, td {
+                text-align: center;
+            }
+
+            .styled-table thead tr {
+                background-color: #8d9493;
+                color: #ffffff;
+                text-align: left;
+            }
+
+            .styled-table th,
+            .styled-table td {
+                padding: 12px 15px;
+            }
+
+            .styled-table tbody tr {
+                border-bottom: 1px solid #dddddd;
+            }
+
+                .styled-table tbody tr:nth-of-type(even) {
+                    background-color: #eaeaea;
+                }
+
+                .styled-table tbody tr:last-of-type {
+                    border-bottom: 2px solid #7d7d7d;
+                }
+
+
+
+        /* The container */
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            margin-right: 5px;
+            cursor: pointer;
+            font-size: 22px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+            /* Hide the browser's default radio button */
+            .container input {
+                position: absolute;
+                opacity: 0;
+                cursor: pointer;
+            }
+
+        /* Create a custom radio button */
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #eee;
+            border-radius: 50%;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .container:hover input ~ .checkmark {
+            background-color: #ccc;
+        }
+
+        /* When the radio button is checked, add a blue background */
+        .container input:checked ~ .checkmark {
+            background-color: #2196F3;
+        }
+
+        /* Create the indicator (the dot/circle - hidden when not checked) */
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+        }
+
+        /* Show the indicator (dot/circle) when checked */
+        .container input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        /* Style the indicator (dot/circle) */
+        .container .checkmark:after {
+            top: 9px;
+            left: 9px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+        }
+    </style>
+
+    <div id="app">
+        <div>
+            <div style="width:600px;height:400px;margin:100px auto auto auto;">
+
+                <div style="width:250px;height:30px; margin:auto;">
+
+                    <div style="float:left;" v-for="selection in selections">
+
+                        <label class="container" :for="selection.name">
+                            {{selection.name}}
+                            <input type="radio" name="my_selection" :id="selection.name" v-on:click="onSelect(selection.name)">
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>
+                </div>
+                <div style="clear:both;"></div>
+
+                <div style="float:left;margin:auto;width:50%;">
+
+                    <div>
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        selection results via js
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>selection</th>
+                                    <th>count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="result in selectionResultsJS">
+                                    <td>{{result.name}}</td>
+                                    <td>{{result.value}}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </div>
+
+                <div style="float:left; margin:auto;width:50%;">
+
+                    <div>
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="2">
+                                        selection results via socket
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <th>selection</th>
+                                    <th>count</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="result in selectionResultsSocket">
+                                    <td>{{result.name}}</td>
+                                    <td>{{result.value}}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script language="javascript" type="text/javascript">
+
+        var vm = new Vue({
+            el: '#app',
+
+            created: function () {
+                console.log("vuejs created");
+                this.user_id = 'test-user';
+                this.ip = '127.0.0.1';
+            },
+            data: {
+                user_id: '',
+                ip: '',
+                name: "resul",
+                selections: [{ "name": "a", "value": "a" }, { "name": "b", "value": "b" }, { "name": "c", "value": "c" }, { "name": "d", "value": "d" }],
+                selectionResultsJS: [{ "name": "a", "value": 0 }, { "name": "b", "value": 0 }, { "name": "c", "value": 0 }, { "name": "d", "value": 0 }],
+                selectionResultsSocket: [{ "name": "a", "value": 0 }, { "name": "b", "value": 0 }, { "name": "c", "value": 0 }, { "name": "d", "value": 0 }],
+
+            },
+            methods: {
+
+                onSelect(selection) {
+
+                    var results = this.selectionResultsJS.filter(e => e.name === selection);
+                    if (results && results.length > 0) {
+                        var result = results[0];
+                        result.value += 1;
+                    }
+
+                    var uuid = this.guid();
+                    var userId = this.user_id;
+
+                    // Send a POST request
+                    axios({
+                        method: 'post',
+                        url: 'http://localhost:8080/api/selections/async',
+                        data: {
+                            name: selection,
+                            id: uuid,
+                            user_id: userId
+                        }
+                    })
+                        .then(response => {
+                            //console.log(response.data);
+                        })
+                        .catch(error => {
+                            console.log(error)
+
+                        })
+                        .finally(() => { })
+                },
+                synchronize() {
+
+                    var userId = this.user_id;
+
+                    // Send a POST request
+                    axios({
+                        method: 'post',						
+                        url: 'http://localhost:8080/api/selections/synchronization',
+                        data: {
+                            user_id: userId
+                        }
+                    })
+                        .then(response => {
+                            console.log(response.data);
+                        })
+                        .catch(error => {
+                            console.log(error)
+
+                        });
+
+                },
+                guid() {
+                    return (this.S4() + this.S4() + "-" + this.S4() + "-4" + this.S4().substr(0, 3) + "-" + this.S4() + "-" + this.S4() + this.S4() + this.S4()).toLowerCase();
+                },
+                S4() {
+                    return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+                }
+            }
+        })
+
+    </script>
+
+    <script language="javascript" type="text/javascript">
+        var uri = "ws://localhost:8080/ws";
+
+        function connect() {
+            socket = new WebSocket(uri);
+
+            socket.onopen = function (event) {
+                console.log("opened connection to " + uri);
+                var message = { "code": "connect", "data": { "ip": vm._data.ip, "user": vm._data.user_id } };
+                socket.send(JSON.stringify(message));
+
+
+                vm.synchronize();
+
+            };
+
+            socket.onclose = function (event) {
+                console.log("closed connection from " + uri + " event :" + JSON.stringify(event));
+            };
+
+            socket.onmessage = function (event) {
+
+                var message = JSON.parse(event.data);
+                //console.log(message);
+
+                if (message.code) {
+                    if (message.code === 'selection_count_calculated') {
+                        var results = vm._data.selectionResultsSocket.filter(e => e.name === message.data.name);
+
+                        if (results && results.length > 0) {
+                            results[0].value = message.data.count;
+                        }
+                    } else if (message.code === 'selection_synchronization_calculated') {
+
+                        if (message.data && message.data.length > 0) {
+
+                            for (var i = 0; i < message.data.length; i++) {
+
+                                //synchronize socket result
+                                var socketResults = vm._data.selectionResultsSocket.filter(e => e.name === message.data[i].name);
+
+                                if (socketResults && socketResults.length > 0) {
+                                    socketResults[0].value = message.data[i].count;
+                                }
+
+                                //synchronize js result
+                                var jsResults = vm._data.selectionResultsJS.filter(e => e.name === message.data[i].name);
+                                if (jsResults && jsResults.length > 0) {
+                                    jsResults[0].value = message.data[i].count;
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            socket.onerror = function (event) {
+                console.log("error: " + event.data);
+            };
+        }
+
+        connect();
+
+    </script>
+</body>
+
+</html>

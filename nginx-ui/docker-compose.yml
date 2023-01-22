@@ -1,0 +1,10 @@
+version: '3.1'
+services:
+  ngnix-ui:
+    image: 'nginx'
+    container_name: ngnix-ui
+    ports:
+      - '8081:80'
+    volumes:
+      - './html:/usr/share/nginx/html'
+      
