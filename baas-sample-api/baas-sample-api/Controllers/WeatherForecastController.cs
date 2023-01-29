@@ -48,4 +48,38 @@ public class WeatherForecastController : ControllerBase
 
         return id;
     }
+
+
+    [HttpGet]
+    [ActionName("quota_with_request_header")]
+    public string QuotaWithRequestHeader()
+    {
+        return "ok";
+    }
+
+    [HttpGet]
+    [ActionName("quota_with_route/{id}")]
+    public string QuotaWithRequestHeader([FromRoute] string id)
+    {
+        return id;
+    }
+
+
+    [HttpGet]
+    [ActionName("quota_with_query_string")]
+    public string QuotaWithQueryString([FromQuery] string name)
+    {
+        return name;
+    }
+
+
+    [HttpPost]
+    [ActionName("quota_with_request_body_json_path")]
+    public WeatherForecast QuotaWithRequestBodyJsonPath([FromBody] WeatherForecast weatherForecast)
+    {
+        return weatherForecast;
+    }
+
+
+
 }

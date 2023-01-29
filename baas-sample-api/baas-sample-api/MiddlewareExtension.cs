@@ -1,8 +1,7 @@
-﻿using System;
-namespace baas_sample_api
+﻿namespace baas_sample_api
 {
-	public static class MiddlewareExtension
-	{
+    public static class MiddlewareExtension
+    {
         public static IApplicationBuilder UseBaasAuthentication(this IApplicationBuilder applicationBuilder)
         {
             return applicationBuilder.UseMiddleware<BaasAuthenticationMiddleware>();
@@ -36,6 +35,11 @@ namespace baas_sample_api
         public static IApplicationBuilder UseBaasRatelimiting(this IApplicationBuilder applicationBuilder)
         {
             return applicationBuilder.UseMiddleware<BaasRateLimitingMiddleware>();
+        }
+
+        public static IApplicationBuilder UseBaasQuotaManagement(this IApplicationBuilder applicationBuilder)
+        {
+            return applicationBuilder.UseMiddleware<BaasQuotaManagementMiddleware>();
         }
 
     }

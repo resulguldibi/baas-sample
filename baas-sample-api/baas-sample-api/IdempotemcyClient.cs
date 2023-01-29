@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text.Json;
-using Microsoft.Extensions.Caching.Memory;
+﻿using System.Text.Json;
 using StackExchange.Redis;
 
 namespace baas_sample_api
@@ -18,11 +16,17 @@ namespace baas_sample_api
 
         public (bool, IdempotentData?) IsIdempotent(string idempotemcyKey, string randomValue)
         {
-
-
             #region check is transaction idempotent
-            RedisValue idempotentData = this.cache.StringGet(idempotemcyKey);
 
+            RedisValue idempotentData = RedisValue.Null;
+            try
+            {
+                idempotentData = this.cache.StringGet(idempotemcyKey);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             if (!string.IsNullOrEmpty(idempotentData) && !idempotentData.IsNull && idempotentData.HasValue)
             {
@@ -31,10 +35,18 @@ namespace baas_sample_api
             else
             {
                 #region check is transaction-id in use
+                RedisResult? redisResult = null;
+                try
+                {
+                    redisResult = this.cache.Execute("SET", new object[] { $"{idempotemcyKey}|LOCK", $"{randomValue}", "NX", "PX", 30000 });
 
-                RedisResult redisResult = this.cache.Execute("SET", new object[] { $"{idempotemcyKey}|LOCK", $"{randomValue}", "NX", "PX", 30000 });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
 
-                if (redisResult.IsNull)
+                if (redisResult != null && redisResult.IsNull)
                 {
                     throw new Exception("transaction is in use");
                 }
@@ -46,27 +58,32 @@ namespace baas_sample_api
 
             #endregion
 
-
-
         }
 
         public void MarkAsIdempotent(string idempotemcyKey, string randomValue, IdempotentData idempotentData, long idempotemcyRetentionMs)
         {
-            this.cache.StringSet(idempotemcyKey, JsonSerializer.Serialize(idempotentData), TimeSpan.FromMilliseconds(idempotemcyRetentionMs));
-
-            #region release lock
-
-            RedisValue idempotemcyLock = this.cache.StringGet($"{idempotemcyKey}|LOCK");
-
-            if (!string.IsNullOrEmpty(idempotemcyLock) && !idempotemcyLock.IsNull && idempotemcyLock.HasValue && idempotemcyLock.Equals(randomValue))
+            try
             {
-                this.cache.KeyDelete($"{idempotemcyKey}|LOCK");
+                #region store idempotent data
+                this.cache.StringSet(idempotemcyKey, JsonSerializer.Serialize(idempotentData), TimeSpan.FromMilliseconds(idempotemcyRetentionMs));
+                #endregion
+
+                #region release lock
+                RedisValue idempotemcyLock = this.cache.StringGet($"{idempotemcyKey}|LOCK");
+
+                if (!string.IsNullOrEmpty(idempotemcyLock) && !idempotemcyLock.IsNull && idempotemcyLock.HasValue && idempotemcyLock.Equals(randomValue))
+                {
+                    this.cache.KeyDelete($"{idempotemcyKey}|LOCK");
+                }
+
+                #endregion
+
             }
-
-            #endregion
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
-
-
     }
 
     /*

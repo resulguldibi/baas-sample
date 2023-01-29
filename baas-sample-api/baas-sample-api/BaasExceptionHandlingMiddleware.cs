@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Mime;
 using System.Text;
@@ -147,6 +148,26 @@ namespace baas_sample_api
                 }
 
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+                if (ex is RateLimitExceedException)
+                {
+                    RateLimitExceedException rex = ((RateLimitExceedException)ex);
+
+                    context.Response.StatusCode = rex.Code;
+                    context.Response.Headers.TryAdd("x-rate-limit-limit", rex.Limit.ToString());
+                    context.Response.Headers.TryAdd("x-rate-limit-remaining", rex.Remaining.ToString());
+                    context.Response.Headers.TryAdd("x-rate-limit-reset", rex.Reset.ToString());
+                }
+                else if (ex is QuotaExceedException)
+                {
+                    QuotaExceedException qex = ((QuotaExceedException)ex);
+
+                    context.Response.StatusCode = qex.Code;
+                    context.Response.Headers.TryAdd("x-quota-limit-limit", qex.Limit.ToString());
+                    context.Response.Headers.TryAdd("x-quota-limit-remaining", qex.Remaining.ToString());
+                    context.Response.Headers.TryAdd("x-quota-limit-reset", qex.Reset.ToString());
+                }
+
                 context.Response.ContentType = "application/json";
                 await context.Response.WriteAsync(responseBodyText);
 

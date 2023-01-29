@@ -1,8 +1,6 @@
 using baas_sample_api;
+using Cassandra.Mapping;
 using client.cassandra.core;
-using job_dispatcher.src.main.core.dispatcher;
-using job_dispatcher.src.main.core.dispatcher.provider;
-using Microsoft.Extensions.Configuration;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +9,10 @@ builder.Services.AddSingleton<IIdempotemcyClient, IdempotemcyViaRedisClient>();
 
 builder.Services.AddSingleton<ILoggingClient, CassandraLoggingClient>();
 
+builder.Services.AddSingleton<IRateLimitingClient, CassandraRateLimitingClient>();
+
+builder.Services.AddSingleton<IQuotaManagementClient, CassandraQuotaManagementClient>();
+
 builder.Services.AddSingleton<ICassandraClientProvider, CassandraClientProvider>();
 
 builder.Services.AddSingleton<ICassandraSessionProvider, CassandraSessionProvider>();
@@ -18,8 +20,6 @@ builder.Services.AddSingleton<ICassandraSessionProvider, CassandraSessionProvide
 builder.Services.AddSingleton<ICassandraClusterProvider, CassandraClusterProvider>();
 
 builder.Services.AddSingleton<ICassandraConnectionInfoProvider, CassandraConnectionInfoProvider>();
-
-
 
 var multiplexer = ConnectionMultiplexer.Connect("redis:6379,abortConnect=false");
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);
@@ -48,10 +48,64 @@ MiddlewareExtension.UseBaasLogging(app);
 MiddlewareExtension.UseBaasAuthentication(app);
 MiddlewareExtension.UseBaasAuthorization(app);
 MiddlewareExtension.UseBaasRatelimiting(app);
+MiddlewareExtension.UseBaasQuotaManagement(app);
 MiddlewareExtension.UseBaasIdempotemcy(app);
 MiddlewareExtension.UseBaasDataIntegrity(app);
 
 app.MapControllers();
+
+MappingConfiguration.Global.Define(
+   new Map<RateLimitingDefinition>()
+      .TableName("baas_rate_limit_definitions")
+      .PartitionKey(new string[] { "tpp_code", "application", "controller", "action", "method", "status" })
+      .Column(u => u.Id, cm => cm.WithName("id"))
+      .Column(u => u.TppCode, cm => cm.WithName("tpp_code"))
+      .Column(u => u.Application, cm => cm.WithName("application"))
+      .Column(u => u.Controller, cm => cm.WithName("controller"))
+      .Column(u => u.Action, cm => cm.WithName("action"))
+      .Column(u => u.Method, cm => cm.WithName("method"))
+      .Column(u => u.LimitPeriod, cm => cm.WithName("limit_period"))
+      .Column(u => u.LimitCount, cm => cm.WithName("limit_count"))
+      .Column(u => u.Status, cm => cm.WithName("status")),
+
+   new Map<RateLimitingTransaction>()
+      .TableName("baas_rate_limit_transactions")
+      .PartitionKey(new string[] { "definition_id", "status_code" })
+      .Column(u => u.Id, cm => cm.WithName("id"))
+      .Column(u => u.DefinitionId, cm => cm.WithName("definition_id"))
+      .Column(u => u.InsertTime, cm => cm.WithName("insert_time"))
+      .Column(u => u.StatusCode, cm => cm.WithName("status_code"))
+      .Column(u => u.TransactionTime, cm => cm.WithName("transaction_time")),
+
+
+   new Map<QuotaDefinition>()
+      .TableName("baas_quota_definitions")
+      .PartitionKey(new string[] { "tpp_code", "application", "controller", "action", "method", "status" })
+      .Column(u => u.Id, cm => cm.WithName("id"))
+      .Column(u => u.TppCode, cm => cm.WithName("tpp_code"))
+      .Column(u => u.Application, cm => cm.WithName("application"))
+      .Column(u => u.Controller, cm => cm.WithName("controller"))
+      .Column(u => u.Action, cm => cm.WithName("action"))
+      .Column(u => u.Method, cm => cm.WithName("method"))
+      .Column(u => u.QuotaPeriod, cm => cm.WithName("quota_period"))
+      .Column(u => u.QuotaKeySourceType, cm => cm.WithName("quota_key_source_type"))
+      .Column(u => u.QuotaKeySourceName, cm => cm.WithName("quota_key_source_name"))
+      .Column(u => u.QuotaCount, cm => cm.WithName("quota_count"))
+      .Column(u => u.Status, cm => cm.WithName("status")),
+
+
+     new Map<QuotaTransaction>()
+      .TableName("baas_quota_transactions")
+      .PartitionKey(new string[] { "definition_id", "status_code" })
+      .Column(u => u.Id, cm => cm.WithName("id"))
+      .Column(u => u.DefinitionId, cm => cm.WithName("definition_id"))
+      .Column(u => u.InsertTime, cm => cm.WithName("insert_time"))
+      .Column(u => u.StatusCode, cm => cm.WithName("status_code"))
+      .Column(u => u.TransactionTime, cm => cm.WithName("transaction_time"))
+      .Column(u => u.QuotaKeySourceValue, cm => cm.WithName("quota_key_source_value"))
+
+      );
+
 
 
 app.Run("http://*:8080");
