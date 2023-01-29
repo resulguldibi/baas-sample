@@ -1,0 +1,257 @@
+{
+	"info": {
+		"_postman_id": "a987142a-e0fe-48c6-8c68-36e4fe6d8e47",
+		"name": "baas-sample",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "quota_with_request_header",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "aaaa",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-transaction-id",
+						"value": "40",
+						"type": "text"
+					},
+					{
+						"key": "x-tpp-code",
+						"value": "tpp-1",
+						"type": "text"
+					},
+					{
+						"key": "Cache-Control",
+						"value": "no-cache; no-store",
+						"type": "default",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/weatherforecast/quota_with_request_header?id={{$guid}}",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"weatherforecast",
+						"quota_with_request_header"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{$guid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quota_with_query_string",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "aaaa",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-transaction-id",
+						"value": "40",
+						"type": "text"
+					},
+					{
+						"key": "x-tpp-code",
+						"value": "tpp-1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/weatherforecast/quota_with_query_string?name=123",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"weatherforecast",
+						"quota_with_query_string"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quota_with_route",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "aaaa",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-transaction-id",
+						"value": "40",
+						"type": "text"
+					},
+					{
+						"key": "x-tpp-code",
+						"value": "tpp-1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/weatherforecast/quota_with_route/1234",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"weatherforecast",
+						"quota_with_route",
+						"1234"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "quota_with_request_body_json_path",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "aaaa",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "aa",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-transaction-id",
+						"value": "40",
+						"type": "text"
+					},
+					{
+						"key": "x-tpp-code",
+						"value": "tpp-1",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"date\": \"2023-01-30\",\n    \"temperatureC\": -12,\n    \"temperatureF\": 11,\n    \"summary\": \"Scorching\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/weatherforecast/quota_with_request_body_json_path",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"weatherforecast",
+						"quota_with_request_body_json_path"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
