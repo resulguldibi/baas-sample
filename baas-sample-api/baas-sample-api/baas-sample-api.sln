@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "job-dispatcher", "..\job-di
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client.cassandra", "..\client.cassandra\client.cassandra.csproj", "{F16B40AA-0D3A-4A15-817F-B9EA6D6DF899}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "client.kafka", "..\client.kafka\client.kafka.csproj", "{0308426E-ECCB-4630-9175-206C24853CE6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{F16B40AA-0D3A-4A15-817F-B9EA6D6DF899}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F16B40AA-0D3A-4A15-817F-B9EA6D6DF899}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F16B40AA-0D3A-4A15-817F-B9EA6D6DF899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0308426E-ECCB-4630-9175-206C24853CE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0308426E-ECCB-4630-9175-206C24853CE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0308426E-ECCB-4630-9175-206C24853CE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0308426E-ECCB-4630-9175-206C24853CE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

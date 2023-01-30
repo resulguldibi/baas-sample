@@ -10,8 +10,10 @@ WORKDIR /src
 COPY ["baas-sample-api/baas-sample-api.csproj", "baas-sample-api/"]
 COPY ["job-dispatcher/job-dispatcher.csproj", "job-dispatcher/"]
 COPY ["client.cassandra/client.cassandra.csproj", "client.cassandra/"]
+COPY ["client.kafka/client.kafka.csproj", "client.kafka/"]
 RUN dotnet restore "job-dispatcher/job-dispatcher.csproj"
 RUN dotnet restore "client.cassandra/client.cassandra.csproj"
+RUN dotnet restore "client.kafka/client.kafka.csproj"
 RUN dotnet restore "baas-sample-api/baas-sample-api.csproj"
 COPY . .
 WORKDIR "/src/baas-sample-api"

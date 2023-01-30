@@ -1,25 +1,30 @@
 using baas_sample_api;
 using Cassandra.Mapping;
 using client.cassandra.core;
+using client.kafka.consumer.core;
+using client.kafka.producer.core;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSingleton<IIdempotemcyClient, IdempotemcyViaRedisClient>();
-
-builder.Services.AddSingleton<ILoggingClient, CassandraLoggingClient>();
-
+//builder.Services.AddSingleton<ILoggingClient, CassandraLoggingClient>();
+builder.Services.AddSingleton<ILoggingClient, KafkaLoggingClient>();
 builder.Services.AddSingleton<IRateLimitingClient, CassandraRateLimitingClient>();
-
 builder.Services.AddSingleton<IQuotaManagementClient, CassandraQuotaManagementClient>();
-
 builder.Services.AddSingleton<ICassandraClientProvider, CassandraClientProvider>();
-
 builder.Services.AddSingleton<ICassandraSessionProvider, CassandraSessionProvider>();
-
 builder.Services.AddSingleton<ICassandraClusterProvider, CassandraClusterProvider>();
-
 builder.Services.AddSingleton<ICassandraConnectionInfoProvider, CassandraConnectionInfoProvider>();
+builder.Services.AddSingleton<IKafkaProducerProvider, KafkaProducerProvider>();
+builder.Services.AddSingleton<IProducerBuilderProvider, ProducerBuilderProvider>();
+builder.Services.AddSingleton<IProducerConfigProvider, ProducerConfigProvider>();
+builder.Services.AddSingleton<IKafkaConsumerProvider, KafkaConsumerProvider>();
+builder.Services.AddSingleton<IConsumerBuilderProvider, ConsumerBuilderProvider>();
+builder.Services.AddSingleton<IConsumerConfigProvider, ConsumerConfigProvider>();
+
+
+builder.Services.AddHostedService<LoggingBackgroundService>();
 
 var multiplexer = ConnectionMultiplexer.Connect("redis:6379,abortConnect=false");
 builder.Services.AddSingleton<IConnectionMultiplexer>(multiplexer);

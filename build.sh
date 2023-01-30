@@ -19,10 +19,13 @@ docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_rate_limi
 
 docker exec -it cassandra cqlsh -e "CREATE TABLE baas_keyspace.baas_quota_definitions (id uuid, tpp_code text, application text, controller text, action text, method text, quota_period bigint, quota_key_source_type text,quota_key_source_name text, quota_count bigint, status boolean, PRIMARY KEY ((tpp_code, application, controller, action, method, status), id));"
 docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_quota_definitions(id);"
-docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definitions(id,tpp_code, application, controller, action, method, quota_period, quota_key_source_type, quota_key_source_name, quota_count, status) values(uuid(), 'tpp-1','baas-sample','WeatherForecast','quota_with_request_header','POST', 3600, 'header','x-tpp-code',5, true);"
+docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definitions(id,tpp_code, application, controller, action, method, quota_period, quota_key_source_type, quota_key_source_name, quota_count, status) values(uuid(), 'tpp-1','baas-sample','WeatherForecast','quota_with_request_header','GET', 3600, 'header','x-tpp-code',5, true);"
 docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definitions(id,tpp_code, application, controller, action, method, quota_period, quota_key_source_type, quota_key_source_name, quota_count, status) values(uuid(), 'tpp-1','baas-sample','WeatherForecast','quota_with_request_body_json_path','POST', 3600, 'body','date',5, true);"
 docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definitions(id,tpp_code, application, controller, action, method, quota_period, quota_key_source_type, quota_key_source_name, quota_count, status) values(uuid(), 'tpp-1','baas-sample','WeatherForecast','quota_with_query_string','GET', 3600, 'query','name',5, true);"
 docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definitions(id,tpp_code, application, controller, action, method, quota_period, quota_key_source_type, quota_key_source_name, quota_count, status) values(uuid(), 'tpp-1','baas-sample','WeatherForecast','quota_with_route/{id}','GET', 3600, 'route','id',5, true);"
 
 docker exec -it cassandra cqlsh -e "CREATE TABLE baas_keyspace.baas_quota_transactions (id uuid, definition_id uuid, status_code int, quota_key_source_value text, insert_time bigint, transaction_time bigint, PRIMARY KEY (definition_id, quota_key_source_value, transaction_time, id));"
 docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_quota_transactions(id);"
+
+
+docker exec -it kafka bash -c "kafka-topics.sh --zookeeper zookeeper:2181 --topic baas_logs --partitions 1 --replication-factor 1 --create"
