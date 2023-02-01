@@ -52,6 +52,7 @@ MiddlewareExtension.UseBaasExceptionHandling(app);
 MiddlewareExtension.UseBaasLogging(app);
 MiddlewareExtension.UseBaasAuthentication(app);
 MiddlewareExtension.UseBaasAuthorization(app);
+MiddlewareExtension.UseBaasConsent(app);
 MiddlewareExtension.UseBaasRatelimiting(app);
 MiddlewareExtension.UseBaasQuotaManagement(app);
 MiddlewareExtension.UseBaasIdempotemcy(app);

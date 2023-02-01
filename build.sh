@@ -27,5 +27,11 @@ docker exec -it cassandra cqlsh -e "INSERT INTO baas_keyspace.baas_quota_definit
 docker exec -it cassandra cqlsh -e "CREATE TABLE baas_keyspace.baas_quota_transactions (id uuid, definition_id uuid, status_code int, quota_key_source_value text, insert_time bigint, transaction_time bigint, PRIMARY KEY (definition_id, quota_key_source_value, transaction_time, id));"
 docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_quota_transactions(id);"
 
+docker exec -it cassandra cqlsh -e "CREATE TABLE baas_keyspace.baas_consent_definitions (id uuid, tpp_code text, application text, controller text, action text, method text, consent_key_source_type text, consent_key_source_name text, status boolean, PRIMARY KEY ((tpp_code, application, controller, action, method), id));"
+docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_consent_definitions(id);"
+
+
+docker exec -it cassandra cqlsh -e "CREATE TABLE baas_keyspace.baas_consent_data (id uuid, definition_id uuid, customer_id bigint, consent_key_source_value text, consent_expiration_time bigint, consent_cancellation_time bigint, status boolean, PRIMARY KEY ((definition_id), id));"
+docker exec -it cassandra cqlsh -e "CREATE INDEX on baas_keyspace.baas_consent_data(id);"
 
 docker exec -it kafka bash -c "kafka-topics.sh --zookeeper zookeeper:2181 --topic baas_logs --partitions 1 --replication-factor 1 --create"

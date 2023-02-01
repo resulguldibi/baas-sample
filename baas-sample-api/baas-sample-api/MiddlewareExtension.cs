@@ -42,6 +42,12 @@
             return applicationBuilder.UseMiddleware<BaasQuotaManagementMiddleware>();
         }
 
+
+        public static IApplicationBuilder UseBaasConsent(this IApplicationBuilder applicationBuilder)
+        {
+            return applicationBuilder.UseMiddleware<BaasConsentMiddleware>();
+        }
+
     }
 }
 
