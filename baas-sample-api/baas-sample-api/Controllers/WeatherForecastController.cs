@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using StackExchange.Redis;
 
 namespace baas_sample_api.Controllers;
 
@@ -12,10 +13,15 @@ public class WeatherForecastController : ControllerBase
     };
 
     private readonly ILogger<WeatherForecastController> _logger;
+    private readonly IConnectionMultiplexer connectionMultiplexer;
+    private readonly IDatabase cache;
 
-    public WeatherForecastController(ILogger<WeatherForecastController> logger)
+
+    public WeatherForecastController(ILogger<WeatherForecastController> logger, IConnectionMultiplexer connectionMultiplexer)
     {
         _logger = logger;
+        this.connectionMultiplexer = connectionMultiplexer;
+        this.cache = this.connectionMultiplexer.GetDatabase();
     }
 
     [HttpGet]
@@ -38,6 +44,18 @@ public class WeatherForecastController : ControllerBase
     {
         Thread.Sleep(10000);
         return weatherForecast;
+    }
+
+    [HttpGet]
+    [ActionName("redis")]
+    public object RedisTest()
+    {
+        long transactionTime = (int)(DateTime.Now - new DateTime(1970, 1, 1)).TotalSeconds;
+        RedisResult result = this.cache.Execute("EVAL", "local data = redis.call('hsetnx',KEYS[1],KEYS[2],ARGV[1]); if data == 1 then redis.call('expire',KEYS[1],ARGV[2]); end;  redis.call('hincrby',KEYS[1],KEYS[3],1); return redis.call('hgetall',KEYS[1]); ", 3, "my_data", "transaction_time", "counter", transactionTime, 300);
+
+        RedisResult[] results = (RedisResult[])result;
+
+        return results.Select(e => (((RedisValue)e).ToString()));
     }
 
     [HttpGet]
